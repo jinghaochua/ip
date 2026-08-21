@@ -15,6 +15,20 @@ public class Bastion {
         System.out.println("____________________________________________________________");
         System.out.println("Bye. Hope to see you again soon!");
         System.out.println("____________________________________________________________");
+        System.out.println("What can I do for you?");
+        System.out.println("    ________________________________________________________");
+        System.out.println("list");
+        System.out.println("        list");
+        System.out.println("    ________________________________________________________");
+        System.out.println("blah");
+        System.out.println("        blah");
+        System.out.println("    ________________________________________________________");
+        System.out.println("bye");
+        System.out.println("    ________________________________________________________");
+        System.out.println("    Bye. Hope to see you again soon!");
+        System.out.println("    ________________________________________________________");
+
+
 
     }
 }
