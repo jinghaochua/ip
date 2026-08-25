@@ -13,6 +13,14 @@ public class Bastion {
             this.isDone = false;
         }
 
+        void markAsDone() {
+            this.isDone = true;
+        }
+
+        void markAsNotDone() {
+            this.isDone = false;
+        }
+
         String getStatusIcon() {
             return (isDone ? "X" : " "); // Returns X if done, space if not
         }
@@ -51,8 +59,9 @@ public class Bastion {
                 } else if (input.startsWith("mark ")) {
                     try {
                         int taskNumber = Integer.parseInt(input.substring(5)) - 1;
+                        tasks[taskNumber].markAsDone();
+                        
                         if (taskNumber >= 0 && taskNumber < taskCount) {
-                            tasks[taskNumber].isDone = true;
                             System.out.println("Nice! I've marked this task as done:");
                             System.out.println("  [" + tasks[taskNumber].getStatusIcon() + "] " + tasks[taskNumber].description);
                         } else {
@@ -64,8 +73,8 @@ public class Bastion {
                 } else if (input.startsWith("unmark ")) {
                     try {
                         int taskNumber = Integer.parseInt(input.substring(7)) - 1;
+                        tasks[taskNumber].markAsNotDone();
                         if (taskNumber >= 0 && taskNumber < taskCount) {
-                            tasks[taskNumber].isDone = false;
                             System.out.println("OK, I've marked this task as not done yet:");
                             System.out.println("  [" + tasks[taskNumber].getStatusIcon() + "] " + tasks[taskNumber].description);
                         } else {
