@@ -4,6 +4,28 @@ public class Bastion {
     /** The maximum number of tasks the application keeps. */
     private static final int MAX_TASKS = 100;
 
+    static class Task {
+        String description;
+        boolean isDone;
+
+        Task(String description) {
+            this.description = description;
+            this.isDone = false;
+        }
+
+        void markAsDone() {
+            this.isDone = true;
+        }
+
+        void markAsNotDone() {
+            this.isDone = false;
+        }
+
+        String getStatusIcon() {
+            return (isDone ? "X" : " "); // Returns X if done, space if not
+        }
+    }
+
     /**
      * Starts the task list application and processes commands until the user enters
      * {@code bye}.
