@@ -5,8 +5,8 @@ public class Bastion {
     private static final int MAX_TASKS = 100;
 
     static class Task {
-        String description;
-        boolean isDone;
+        protected String description;
+        protected boolean isDone;
 
         Task(String description) {
             this.description = description;
@@ -22,19 +22,62 @@ public class Bastion {
         }
 
         String getStatusIcon() {
-            return (isDone ? "X" : " "); // Returns X if done, space if not
+            return (isDone ? "X" : " ");
+        }
+
+        @Override
+        public String toString() {
+            return "[" + getStatusIcon() + "] " + description;
+        }
+    }
+
+    static class Todo extends Task {
+        Todo(String description) {
+            super(description);
+        }
+
+        @Override
+        public String toString() {
+            return "[T]" + super.toString();
+        }
+    }
+
+    static class Deadline extends Task {
+        protected String by;
+
+        Deadline(String description, String by) {
+            super(description);
+            this.by = by;
+        }
+
+        @Override
+        public String toString() {
+            return "[D]" + super.toString() + " (by: " + by + ")";
+        }
+    }
+
+    static class Event extends Task {
+        protected String from;
+        protected String to;
+
+        Event(String description, String from, String to) {
+            super(description);
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public String toString() {
+            return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
         }
     }
 
     /**
      * Starts the task list application and processes commands until the user enters
      * {@code bye}.
-     * Any input other than those commands is added as a task; {@code list} displays
-     * stored tasks.
      *
      * @param args command-line arguments, which are not used
      */
-
     public static void main(String[] args) {
         Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
@@ -57,31 +100,32 @@ public class Bastion {
                 if (input.equals("list")) {
                     printTasks(tasks, taskCount);
                 } else if (input.startsWith("mark ")) {
-                    try {
-                        int taskNumber = Integer.parseInt(input.substring(5)) - 1;
-                        tasks[taskNumber].markAsDone();
-                        
-                        if (taskNumber >= 0 && taskNumber < taskCount) {
-                            System.out.println("Nice! I've marked this task as done:");
-                            System.out.println("  [" + tasks[taskNumber].getStatusIcon() + "] " + tasks[taskNumber].description);
-                        } else {
-                            System.out.println("Invalid task number.");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Please provide a valid task number after 'mark'.");
-                    }
+                    handleMark(tasks, taskCount, input, true);
                 } else if (input.startsWith("unmark ")) {
-                    try {
-                        int taskNumber = Integer.parseInt(input.substring(7)) - 1;
-                        tasks[taskNumber].markAsNotDone();
-                        if (taskNumber >= 0 && taskNumber < taskCount) {
-                            System.out.println("OK, I've marked this task as not done yet:");
-                            System.out.println("  [" + tasks[taskNumber].getStatusIcon() + "] " + tasks[taskNumber].description);
-                        } else {
-                            System.out.println("Invalid task number.");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Please provide a valid task number after 'unmark'.");
+                    handleMark(tasks, taskCount, input, false);
+                } else if (input.startsWith("todo ")) {
+                    taskCount = addTask(tasks, taskCount, "todo", input.substring(5).trim());
+                } else if (input.startsWith("deadline ")) {
+                    String details = input.substring(9).trim();
+                    int byIndex = details.lastIndexOf(" /by ");
+                    if (byIndex >= 0) {
+                        String description = details.substring(0, byIndex).trim();
+                        String by = details.substring(byIndex + 4).trim();
+                        taskCount = addTask(tasks, taskCount, "deadline", description, by);
+                    } else {
+                        taskCount = addTask(tasks, taskCount, "deadline", details, "");
+                    }
+                } else if (input.startsWith("event ")) {
+                    String details = input.substring(6).trim();
+                    int fromIndex = details.indexOf(" /from ");
+                    int toIndex = details.lastIndexOf(" /to ");
+                    if (fromIndex >= 0 && toIndex > fromIndex) {
+                        String description = details.substring(0, fromIndex).trim();
+                        String from = details.substring(fromIndex + 6, toIndex).trim();
+                        String to = details.substring(toIndex + 4).trim();
+                        taskCount = addTask(tasks, taskCount, "event", description, from, to);
+                    } else {
+                        taskCount = addTask(tasks, taskCount, "event", details, "", "");
                     }
                 } else if (taskCount == MAX_TASKS) {
                     System.out.println("Sorry, the task list is full.");
@@ -96,14 +140,104 @@ public class Bastion {
         }
     }
 
+    private static int addTask(Task[] tasks, int taskCount, String type, String description) {
+        if (description.isEmpty()) {
+            System.out.println("The description of a task cannot be empty.");
+            return taskCount;
+        }
+
+        if (taskCount == MAX_TASKS) {
+            System.out.println("Sorry, the task list is full.");
+            return taskCount;
+        }
+
+        switch (type) {
+        case "todo":
+            tasks[taskCount] = new Todo(description);
+            break;
+        case "deadline":
+            tasks[taskCount] = new Deadline(description, "");
+            break;
+        case "event":
+            tasks[taskCount] = new Event(description, "", "");
+            break;
+        default:
+            tasks[taskCount] = new Task(description);
+            break;
+        }
+
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + tasks[taskCount]);
+        System.out.println("Now you have " + (taskCount + 1) + " tasks in the list.");
+        return taskCount + 1;
+    }
+
+    private static int addTask(Task[] tasks, int taskCount, String type, String description, String by) {
+        if (description.isEmpty()) {
+            System.out.println("The description of a task cannot be empty.");
+            return taskCount;
+        }
+
+        if (taskCount == MAX_TASKS) {
+            System.out.println("Sorry, the task list is full.");
+            return taskCount;
+        }
+
+        tasks[taskCount] = new Deadline(description, by);
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + tasks[taskCount]);
+        System.out.println("Now you have " + (taskCount + 1) + " tasks in the list.");
+        return taskCount + 1;
+    }
+
+    private static int addTask(Task[] tasks, int taskCount, String type, String description, String from, String to) {
+        if (description.isEmpty()) {
+            System.out.println("The description of a task cannot be empty.");
+            return taskCount;
+        }
+
+        if (taskCount == MAX_TASKS) {
+            System.out.println("Sorry, the task list is full.");
+            return taskCount;
+        }
+
+        tasks[taskCount] = new Event(description, from, to);
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + tasks[taskCount]);
+        System.out.println("Now you have " + (taskCount + 1) + " tasks in the list.");
+        return taskCount + 1;
+    }
+
+    private static void handleMark(Task[] tasks, int taskCount, String input, boolean isDone) {
+        try {
+            int taskNumber = Integer.parseInt(input.substring(input.indexOf(' ') + 1)) - 1;
+            if (taskNumber < 0 || taskNumber >= taskCount) {
+                System.out.println("Invalid task number.");
+                return;
+            }
+
+            if (isDone) {
+                tasks[taskNumber].markAsDone();
+                System.out.println("Nice! I've marked this task as done:");
+            } else {
+                tasks[taskNumber].markAsNotDone();
+                System.out.println("OK, I've marked this task as not done yet:");
+            }
+            System.out.println("  " + tasks[taskNumber]);
+        } catch (NumberFormatException e) {
+            System.out.println("Please provide a valid task number after 'mark'.");
+        }
+    }
+
     private static void printTasks(Task[] tasks, int taskCount) {
         if (taskCount == 0) {
             System.out.println("Your task list is empty.");
             return;
         }
 
+        System.out.println("Here are the tasks in your list:");
         for (int index = 0; index < taskCount; index++) {
-            System.out.println((index + 1) + ". [" + tasks[index].getStatusIcon() + "] " + tasks[index].description);
+            System.out.println((index + 1) + "." + tasks[index]);
         }
     }
 
