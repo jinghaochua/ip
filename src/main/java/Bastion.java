@@ -1,3 +1,5 @@
+package bastion;
+
 import java.util.Scanner;
 
 public class Bastion {
@@ -72,6 +74,12 @@ public class Bastion {
         }
     }
     
+    /**
+     * Creates a task based on the given user input.
+     *
+     * @param input the user input describing the task
+     * @return the created task, or null if the input is invalid
+     */
     private static Task createTask(String input) {
         if (input.startsWith("todo ")) {
             String description = input.substring(5).strip();
@@ -80,7 +88,8 @@ public class Bastion {
 
         if (input.startsWith("deadline ")) {
             int byIndex = input.indexOf(" /by ");
-            if (byIndex <= "deadline ".length() || byIndex + " /by ".length() >= input.length()) {
+            if (byIndex <= "deadline ".length()
+                    || byIndex + " /by ".length() >= input.length()) {
                 return null;
             }
             String description = input.substring("deadline ".length(), byIndex).strip();
@@ -91,7 +100,9 @@ public class Bastion {
         if (input.startsWith("event ")) {
             int fromIndex = input.indexOf(" /from ");
             int toIndex = input.indexOf(" /to ", fromIndex + " /from ".length());
-            if (fromIndex <= "event ".length() || toIndex < 0 || toIndex + " /to ".length() >= input.length()) {
+            if (fromIndex <= "event ".length() 
+                    || toIndex < 0 
+                    || toIndex + " /to ".length() >= input.length()) {
                 return null;
             }
             String description = input.substring("event ".length(), fromIndex).strip();
@@ -116,8 +127,8 @@ public class Bastion {
         }
     }
 
+    /** Prints a horizontal separator line. */
     private static void printLine() {
         System.out.println("____________________________________________________________");
     }
-    
 }

@@ -1,3 +1,5 @@
+package bastion;
+
 /**
  * A task with a description and completion status.
  * Subclasses add details specific to their task type.
