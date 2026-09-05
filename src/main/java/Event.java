@@ -1,5 +1,3 @@
-package bastion;
-
 /** A task that takes place during a specified period. */
 public class Event extends Task {
     protected String from;
