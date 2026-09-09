@@ -1,3 +1,4 @@
+package Bastion;
 import java.util.Scanner;
 
 public class Bastion {
