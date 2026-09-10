@@ -22,6 +22,8 @@ public class Bastion {
                     break;
                 }
 
+                try{
+
                 if (input.equals("list")) {
                     printTasks(tasks, taskCount);
                 } else if (input.startsWith("mark ")) {
@@ -65,9 +67,9 @@ public class Bastion {
                 } else if (input.equals("todo") || input.startsWith("todo ")) {
                     String description = input.equals("todo") ? "" : input.substring(5).strip();
                     if (description.isEmpty()) {
-                        printLine();
-                        System.out.println("Beep Beep Boop!!! The description of a todo cannot be empty.");
-                        printLine();
+                        throw new BastionException(
+                            "Beep Beep Boop!!! The description of a todo cannot be empty.");
+
                     } else if (taskCount == MAX_TASKS) {
                         printLine();
                         System.out.println("Beep Beep Boop!!! The task list is full.");
@@ -112,12 +114,17 @@ public class Bastion {
                         printTaskAdded(tasks[taskCount - 1], taskCount);
                     }
                 } else {
-                    printLine();
-                    System.out.println("Beep Beep Boop!!! I'm sorry, but I don't know what that means :-(");
-                    printLine();
+                    throw new BastionException(
+                        "Beep Beep Boop!!! I'm sorry, but I don't know what that means :-(");
                 }
+                    
+            } catch (BastionException e) {
+                printLine();
+                System.out.println(e.getMessage());
+                printLine();
             }
         }
+    }
     }
 
     private static Deadline createDeadline(String input) {
