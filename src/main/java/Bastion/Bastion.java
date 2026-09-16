@@ -1,12 +1,22 @@
 package Bastion;
+
+import java.util.List;
 import java.util.Scanner;
+import java.io.IOException;
 
 public class Bastion {
     private static final int MAX_TASKS = 100;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        Storage storage = new Storage();
+
+        List<Task> loadedTasks = storage.loadTasks();
+        int taskCount = loadedTasks.size();
+
+        for (int i = 0; i < taskCount; i++) {
+            tasks[i] = loadedTasks.get(i);
+        }
 
         printLine();
         System.out.println("Hello! I'm Bastion.");
@@ -31,6 +41,7 @@ public class Bastion {
                         int taskNumber = Integer.parseInt(input.substring(5)) - 1;
                         if (taskNumber >= 0 && taskNumber < taskCount) {
                             tasks[taskNumber].markAsDone();
+                            storage.saveTasks(tasks, taskCount);
                             printLine();
                             System.out.println("Beep Beep! I've marked this task as done:");
                             System.out.println("  " + tasks[taskNumber]);
@@ -50,6 +61,7 @@ public class Bastion {
                         int taskNumber = Integer.parseInt(input.substring(7)) - 1;
                         if (taskNumber >= 0 && taskNumber < taskCount) {
                             tasks[taskNumber].markAsNotDone();
+                            storage.saveTasks(tasks, taskCount);
                             printLine();
                             System.out.println("Beep Beep! I've marked this task as not done yet:");
                             System.out.println("  " + tasks[taskNumber]);
@@ -77,6 +89,7 @@ public class Bastion {
                     } else {
                         tasks[taskCount] = new Todo(description);
                         taskCount++;
+                        storage.saveTasks(tasks, taskCount);
                         printTaskAdded(tasks[taskCount - 1], taskCount);
                     }
                 } else if (input.equals("deadline") || input.startsWith("deadline ")) {
@@ -94,6 +107,7 @@ public class Bastion {
                     } else {
                         tasks[taskCount] = task;
                         taskCount++;
+                        storage.saveTasks(tasks, taskCount);
                         printTaskAdded(tasks[taskCount - 1], taskCount);
                     }
                 } else if (input.equals("event") || input.startsWith("event ")) {
@@ -111,6 +125,7 @@ public class Bastion {
                     } else {
                         tasks[taskCount] = task;
                         taskCount++;
+                        storage.saveTasks(tasks, taskCount);
                         printTaskAdded(tasks[taskCount - 1], taskCount);
                     }
                 } else {

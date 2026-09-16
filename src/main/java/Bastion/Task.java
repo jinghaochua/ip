@@ -32,4 +32,13 @@ public class Task {
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;
     }
+
+    /**
+     * Returns this task in a format suitable for saving to a file.
+     *
+     * @return a line representing this task
+     */
+    public String toFileString() {
+        return "T | " + (isDone ? "1" : "0") + " | " + description;
+    }
 }
