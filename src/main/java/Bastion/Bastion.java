@@ -1,12 +1,14 @@
 package Bastion;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Bastion {
     private static final int MAX_TASKS = 100;
 
-    public static void main(String[] args) {
-        ArrayList<Task> tasks = new ArrayList<>();
+    public static void main(String[] args) throws IOException {
+        Storage storage = new Storage();
+        ArrayList<Task> tasks = new ArrayList<>(storage.loadTasks());
 
         printLine();
         System.out.println("Hello! I'm Bastion.");
@@ -32,6 +34,7 @@ public class Bastion {
                             int taskNumber = Integer.parseInt(input.substring(5)) - 1;
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
                                 tasks.get(taskNumber).markAsDone();
+                                storage.saveTasks(tasks);
                                 printLine();
                                 System.out.println("Beep Beep! I've marked this task as done:");
                                 System.out.println("  " + tasks.get(taskNumber));
@@ -53,6 +56,7 @@ public class Bastion {
                             int taskNumber = Integer.parseInt(input.substring(7)) - 1;
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
                                 tasks.get(taskNumber).markAsNotDone();
+                                storage.saveTasks(tasks);
                                 printLine();
                                 System.out.println("Beep Beep! I've marked this task as not done yet:");
                                 System.out.println("  " + tasks.get(taskNumber));
@@ -81,6 +85,7 @@ public class Bastion {
                             printLine();
                         } else {
                             tasks.add(new Todo(description));
+                            storage.saveTasks(tasks);
                             printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     }
@@ -99,6 +104,7 @@ public class Bastion {
                             printLine();
                         } else {
                             tasks.add(task);
+                            storage.saveTasks(tasks);
                             printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     } 
@@ -117,6 +123,7 @@ public class Bastion {
                             printLine();
                         } else {
                             tasks.add(task);
+                            storage.saveTasks(tasks);
                             printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     } 
@@ -128,6 +135,7 @@ public class Bastion {
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
                                 Task removedTask = tasks.get(taskNumber);
                                 tasks.remove(taskNumber);
+                                storage.saveTasks(tasks);
                                 
                                 printLine();
                                 System.out.println("Beep Beep! I've removed this task:");
