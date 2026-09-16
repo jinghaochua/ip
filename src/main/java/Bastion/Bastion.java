@@ -28,7 +28,6 @@ public class Bastion {
                     if (input.equals("list")) {
                         printTasks(tasks);
                     } 
-                    
                     else if (input.startsWith("mark ")) {
                         try {
                             int taskNumber = Integer.parseInt(input.substring(5)) - 1;
@@ -78,7 +77,6 @@ public class Bastion {
                         if (description.isEmpty()) {
                             throw new BastionException(
                                 "Beep Beep Boop!!! The description of a todo cannot be empty.");
-
                         } else if (tasks.size() == MAX_TASKS) {
                             printLine();
                             System.out.println("Beep Beep Boop!!! The task list is full.");
@@ -155,7 +153,6 @@ public class Bastion {
                         }
                     }
 
-                    
                     else {
                         throw new BastionException(
                             "Beep Beep Boop!!! I'm sorry, but I don't know what that means :-(");
