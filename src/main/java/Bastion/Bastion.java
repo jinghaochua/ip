@@ -1,12 +1,12 @@
 package Bastion;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Bastion {
     private static final int MAX_TASKS = 100;
 
     public static void main(String[] args) {
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         printLine();
         System.out.println("Hello! I'm Bastion.");
@@ -23,108 +23,143 @@ public class Bastion {
                 }
 
                 try{
-
-                if (input.equals("list")) {
-                    printTasks(tasks, taskCount);
-                } else if (input.startsWith("mark ")) {
-                    try {
-                        int taskNumber = Integer.parseInt(input.substring(5)) - 1;
-                        if (taskNumber >= 0 && taskNumber < taskCount) {
-                            tasks[taskNumber].markAsDone();
-                            printLine();
-                            System.out.println("Beep Beep! I've marked this task as done:");
-                            System.out.println("  " + tasks[taskNumber]);
-                            printLine();
-                        } else {
-                            printLine();
-                            System.out.println(" Beep Beep Boop!!! Invalid task number.");
-                            printLine();
-                        }
-                    } catch (NumberFormatException e) {
-                        printLine();
-                        System.out.println(" Beep Beep Boop!!! Please provide a valid task number after 'mark'.");
-                        printLine();
-                    }
-                } else if (input.startsWith("unmark ")) {
-                    try {
-                        int taskNumber = Integer.parseInt(input.substring(7)) - 1;
-                        if (taskNumber >= 0 && taskNumber < taskCount) {
-                            tasks[taskNumber].markAsNotDone();
-                            printLine();
-                            System.out.println("Beep Beep! I've marked this task as not done yet:");
-                            System.out.println("  " + tasks[taskNumber]);
-                            printLine();
-                        } else {
-                            printLine();
-                            System.out.println("Beep Beep Boop!!! Invalid task number.");
-                            printLine();
-                        }
-                    } catch (NumberFormatException e) {
-                        printLine();
-                        System.out.println("Beep Beep Boop!!! Please provide a valid task number after 'unmark'.");
-                        printLine();
-                    }
-                } else if (input.equals("todo") || input.startsWith("todo ")) {
-                    String description = input.equals("todo") ? "" : input.substring(5).strip();
-                    if (description.isEmpty()) {
-                        throw new BastionException(
-                            "Beep Beep Boop!!! The description of a todo cannot be empty.");
-
-                    } else if (taskCount == MAX_TASKS) {
-                        printLine();
-                        System.out.println("Beep Beep Boop!!! The task list is full.");
-                        printLine();
-                    } else {
-                        tasks[taskCount] = new Todo(description);
-                        taskCount++;
-                        printTaskAdded(tasks[taskCount - 1], taskCount);
-                    }
-                } else if (input.equals("deadline") || input.startsWith("deadline ")) {
-                    if (taskCount == MAX_TASKS) {
-                        printLine();
-                        System.out.println("Beep Beep Boop!!! The task list is full.");
-                        printLine();
-                        continue;
-                    }
-                    Task task = createDeadline(input);
-                    if (task == null) {
-                        printLine();
-                        System.out.println("Beep Beep Boop!!! The description or deadline date cannot be empty. Format: deadline [desc] /by [date]");
-                        printLine();
-                    } else {
-                        tasks[taskCount] = task;
-                        taskCount++;
-                        printTaskAdded(tasks[taskCount - 1], taskCount);
-                    }
-                } else if (input.equals("event") || input.startsWith("event ")) {
-                    if (taskCount == MAX_TASKS) {
-                        printLine();
-                        System.out.println("Beep Beep Boop!!! The task list is full.");
-                        printLine();
-                        continue;
-                    }
-                    Task task = createEvent(input);
-                    if (task == null) {
-                        printLine();
-                        System.out.println("Beep Beep Boop!!! The description or event timing cannot be empty. Format: event [desc] /from [date] /to [date]");
-                        printLine();
-                    } else {
-                        tasks[taskCount] = task;
-                        taskCount++;
-                        printTaskAdded(tasks[taskCount - 1], taskCount);
-                    }
-                } else {
-                    throw new BastionException(
-                        "Beep Beep Boop!!! I'm sorry, but I don't know what that means :-(");
-                }
+                    if (input.equals("list")) {
+                        printTasks(tasks);
+                    } 
                     
-            } catch (BastionException e) {
-                printLine();
-                System.out.println(e.getMessage());
-                printLine();
+                    else if (input.startsWith("mark ")) {
+                        try {
+                            int taskNumber = Integer.parseInt(input.substring(5)) - 1;
+                            if (taskNumber >= 0 && taskNumber < tasks.size()) {
+                                tasks.get(taskNumber).markAsDone();
+                                printLine();
+                                System.out.println("Beep Beep! I've marked this task as done:");
+                                System.out.println("  " + tasks.get(taskNumber));
+                                printLine();
+                            } else {
+                                printLine();
+                                System.out.println(" Beep Beep Boop!!! Invalid task number.");
+                                printLine();
+                            }
+                        } catch (NumberFormatException e) {
+                            printLine();
+                            System.out.println(" Beep Beep Boop!!! Please provide a valid task number after 'mark'.");
+                            printLine();
+                        }
+                    } 
+                    
+                    else if (input.startsWith("unmark ")) {
+                        try {
+                            int taskNumber = Integer.parseInt(input.substring(7)) - 1;
+                            if (taskNumber >= 0 && taskNumber < tasks.size()) {
+                                tasks.get(taskNumber).markAsNotDone();
+                                printLine();
+                                System.out.println("Beep Beep! I've marked this task as not done yet:");
+                                System.out.println("  " + tasks.get(taskNumber));
+                                printLine();
+                            } else {
+                                printLine();
+                                System.out.println("Beep Beep Boop!!! Invalid task number.");
+                                printLine();
+                            }
+                        } catch (NumberFormatException e) {
+                            printLine();
+                            System.out.println("Beep Beep Boop!!! Please provide a valid task number after 'unmark'.");
+                            printLine();
+                        }
+                    } 
+                    
+                    else if (input.equals("todo") || input.startsWith("todo ")) {
+                        String description = input.equals("todo") ? "" : input.substring(5).strip();
+                        if (description.isEmpty()) {
+                            throw new BastionException(
+                                "Beep Beep Boop!!! The description of a todo cannot be empty.");
+
+                        } else if (tasks.size() == MAX_TASKS) {
+                            printLine();
+                            System.out.println("Beep Beep Boop!!! The task list is full.");
+                            printLine();
+                        } else {
+                            tasks.add(new Todo(description));
+                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                        }
+                    }
+                    
+                    else if (input.equals("deadline") || input.startsWith("deadline ")) {
+                        if (tasks.size() == MAX_TASKS) {
+                            printLine();
+                            System.out.println("Beep Beep Boop!!! The task list is full.");
+                            printLine();
+                            continue;
+                        }
+                        Task task = createDeadline(input);
+                        if (task == null) {
+                            printLine();
+                            System.out.println("Beep Beep Boop!!! The description or deadline date cannot be empty. Format: deadline [desc] /by [date]");
+                            printLine();
+                        } else {
+                            tasks.add(task);
+                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                        }
+                    } 
+                    
+                    else if (input.equals("event") || input.startsWith("event ")) {
+                        if (tasks.size() == MAX_TASKS) {
+                            printLine();
+                            System.out.println("Beep Beep Boop!!! The task list is full.");
+                            printLine();
+                            continue;
+                        }
+                        Task task = createEvent(input);
+                        if (task == null) {
+                            printLine();
+                            System.out.println("Beep Beep Boop!!! The description or event timing cannot be empty. Format: event [desc] /from [date] /to [date]");
+                            printLine();
+                        } else {
+                            tasks.add(task);
+                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                        }
+                    } 
+
+                    else if (input.startsWith("delete ")) {
+                        try {
+                            String numberString = input.substring(7).strip(); 
+                            int taskNumber = Integer.parseInt(numberString) - 1;
+                            if (taskNumber >= 0 && taskNumber < tasks.size()) {
+                                Task removedTask = tasks.get(taskNumber);
+                                tasks.remove(taskNumber);
+                                
+                                printLine();
+                                System.out.println("Beep Beep! I've removed this task:");
+                                System.out.println("  " + removedTask);
+                                System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                                printLine();
+                            } else {
+                                printLine();
+                                System.out.println("Beep Beep Boop!!! Invalid task number.");
+                                printLine();
+                            }
+
+                        } catch (NumberFormatException e) {
+                            printLine();
+                            System.out.println("Beep Beep Boop!!! Please provide a valid task number after 'delete'.");
+                            printLine();
+                        }
+                    }
+
+                    
+                    else {
+                        throw new BastionException(
+                            "Beep Beep Boop!!! I'm sorry, but I don't know what that means :-(");
+                    }
+                        
+                } catch (BastionException e) {
+                    printLine();
+                    System.out.println(e.getMessage());
+                    printLine();
+                }
             }
         }
-    }
     }
 
     private static Deadline createDeadline(String input) {
@@ -160,16 +195,16 @@ public class Bastion {
         printLine();
     }
 
-    private static void printTasks(Task[] tasks, int taskCount) {
+    private static void printTasks(ArrayList<Task> tasks) {
         printLine();
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             System.out.println("Your task list is empty.");
             printLine();
             return;
         }
         System.out.println("Here are the tasks in your list:");
-        for (int index = 0; index < taskCount; index++) {
-            System.out.println((index + 1) + "." + tasks[index]);
+        for (int index = 0; index < tasks.size(); index++) {
+            System.out.println((index + 1) + "." + tasks.get(index));
         }
         printLine();
     }
