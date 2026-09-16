@@ -1,12 +1,12 @@
 package Bastion;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Bastion {
     private static final int MAX_TASKS = 100;
 
     public static void main(String[] args) {
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         printLine();
         System.out.println("Hello! I'm Bastion.");
@@ -24,17 +24,17 @@ public class Bastion {
 
                 try{
                     if (input.equals("list")) {
-                        printTasks(tasks, taskCount);
+                        printTasks(tasks);
                     } 
                     
                     else if (input.startsWith("mark ")) {
                         try {
                             int taskNumber = Integer.parseInt(input.substring(5)) - 1;
-                            if (taskNumber >= 0 && taskNumber < taskCount) {
-                                tasks[taskNumber].markAsDone();
+                            if (taskNumber >= 0 && taskNumber < tasks.size()) {
+                                tasks.get(taskNumber).markAsDone();
                                 printLine();
                                 System.out.println("Beep Beep! I've marked this task as done:");
-                                System.out.println("  " + tasks[taskNumber]);
+                                System.out.println("  " + tasks.get(taskNumber));
                                 printLine();
                             } else {
                                 printLine();
@@ -51,11 +51,11 @@ public class Bastion {
                     else if (input.startsWith("unmark ")) {
                         try {
                             int taskNumber = Integer.parseInt(input.substring(7)) - 1;
-                            if (taskNumber >= 0 && taskNumber < taskCount) {
-                                tasks[taskNumber].markAsNotDone();
+                            if (taskNumber >= 0 && taskNumber < tasks.size()) {
+                                tasks.get(taskNumber).markAsNotDone();
                                 printLine();
                                 System.out.println("Beep Beep! I've marked this task as not done yet:");
-                                System.out.println("  " + tasks[taskNumber]);
+                                System.out.println("  " + tasks.get(taskNumber));
                                 printLine();
                             } else {
                                 printLine();
@@ -75,19 +75,18 @@ public class Bastion {
                             throw new BastionException(
                                 "Beep Beep Boop!!! The description of a todo cannot be empty.");
 
-                        } else if (taskCount == MAX_TASKS) {
+                        } else if (tasks.size() == MAX_TASKS) {
                             printLine();
                             System.out.println("Beep Beep Boop!!! The task list is full.");
                             printLine();
                         } else {
-                            tasks[taskCount] = new Todo(description);
-                            taskCount++;
-                            printTaskAdded(tasks[taskCount - 1], taskCount);
+                            tasks.add(new Todo(description));
+                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     }
                     
                     else if (input.equals("deadline") || input.startsWith("deadline ")) {
-                        if (taskCount == MAX_TASKS) {
+                        if (tasks.size() == MAX_TASKS) {
                             printLine();
                             System.out.println("Beep Beep Boop!!! The task list is full.");
                             printLine();
@@ -99,14 +98,13 @@ public class Bastion {
                             System.out.println("Beep Beep Boop!!! The description or deadline date cannot be empty. Format: deadline [desc] /by [date]");
                             printLine();
                         } else {
-                            tasks[taskCount] = task;
-                            taskCount++;
-                            printTaskAdded(tasks[taskCount - 1], taskCount);
+                            tasks.add(task);
+                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     } 
                     
                     else if (input.equals("event") || input.startsWith("event ")) {
-                        if (taskCount == MAX_TASKS) {
+                        if (tasks.size() == MAX_TASKS) {
                             printLine();
                             System.out.println("Beep Beep Boop!!! The task list is full.");
                             printLine();
@@ -118,9 +116,8 @@ public class Bastion {
                             System.out.println("Beep Beep Boop!!! The description or event timing cannot be empty. Format: event [desc] /from [date] /to [date]");
                             printLine();
                         } else {
-                            tasks[taskCount] = task;
-                            taskCount++;
-                            printTaskAdded(tasks[taskCount - 1], taskCount);
+                            tasks.add(task);
+                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     } 
 
@@ -128,18 +125,14 @@ public class Bastion {
                         try {
                             String numberString = input.substring(7).strip(); 
                             int taskNumber = Integer.parseInt(numberString) - 1;
-                            if (taskNumber >= 0 && taskNumber < taskCount) {
-                                Task removedTask = tasks[taskNumber];
-                                for (int i = taskNumber; i < taskCount - 1; i++) {
-                                    tasks[i] = tasks[i + 1];
-                                }
-                                tasks[taskCount - 1] = null;
-                                taskCount--;
+                            if (taskNumber >= 0 && taskNumber < tasks.size()) {
+                                Task removedTask = tasks.get(taskNumber);
+                                tasks.remove(taskNumber);
                                 
                                 printLine();
                                 System.out.println("Beep Beep! I've removed this task:");
                                 System.out.println("  " + removedTask);
-                                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                                System.out.println("Now you have " + tasks.size() + " tasks in the list.");
                                 printLine();
                             } else {
                                 printLine();
@@ -202,16 +195,16 @@ public class Bastion {
         printLine();
     }
 
-    private static void printTasks(Task[] tasks, int taskCount) {
+    private static void printTasks(ArrayList<Task> tasks) {
         printLine();
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             System.out.println("Your task list is empty.");
             printLine();
             return;
         }
         System.out.println("Here are the tasks in your list:");
-        for (int index = 0; index < taskCount; index++) {
-            System.out.println((index + 1) + "." + tasks[index]);
+        for (int index = 0; index < tasks.size(); index++) {
+            System.out.println((index + 1) + "." + tasks.get(index));
         }
         printLine();
     }
