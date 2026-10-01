@@ -1,5 +1,3 @@
-D | 1 | finish homework | tmr
-E | 0 | festival | tmr 2pm | tmr 5pm
-T | 1 | play overwatch
-E | 0 | Jinghao attend CS2113 lecture | Friday 20 Feb 2026 4pm | Friday 20 Feb 2026 6pm
-D | 0 | Jinghao submit UG draft | Today 2359
+D | 0 | return book | 2019-12-02T18:00
+D | 0 | submit form | 2019-10-15T00:00
+E | 1 | book | 2026-11-25T14:00 | 2026-11-25T16:00
