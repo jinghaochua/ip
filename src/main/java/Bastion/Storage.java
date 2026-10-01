@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,9 +50,9 @@ public class Storage {
                 if (parts[0].equals("T")) {
                     task = new Todo(parts[2]);
                 } else if (parts[0].equals("D")) {
-                    task = loadDeadline(parts[2], parts[3]);
+                    task = new Deadline(parts[2], LocalDateTime.parse(parts[3]));
                 } else if (parts[0].equals("E")) {
-                    task = new Event(parts[2], parts[3], parts[4]);
+                    task = new Event(parts[2], LocalDateTime.parse(parts[3]), LocalDateTime.parse(parts[4]));
                 } else {
                     continue;
                 }
@@ -69,16 +68,5 @@ public class Storage {
         }
 
         return tasks;
-    }
-
-    /**
-     * Loads a structured deadline when possible while keeping old free-text deadlines usable.
-     */
-    private Task loadDeadline(String description, String dateTime) {
-        try {
-            return new Deadline(description, LocalDateTime.parse(dateTime));
-        } catch (DateTimeParseException e) {
-            return new LegacyDeadline(description, dateTime);
-        }
     }
 }

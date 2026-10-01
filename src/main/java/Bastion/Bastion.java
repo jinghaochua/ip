@@ -156,23 +156,10 @@ public class Bastion {
             return null;
         }
 
-        try {
-            LocalDateTime dateTime = LocalDate.parse(by).atStartOfDay();
-            return new Deadline(description, dateTime);
-        } catch (DateTimeParseException e) {
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/uuuu HHmm")
-                        .withResolverStyle(ResolverStyle.STRICT);
-                LocalDateTime dateTime = LocalDateTime.parse(by, formatter);
-                return new Deadline(description, dateTime);
-            } catch (DateTimeParseException ignored) {
-                throw new BastionException(
-                    "Beep Beep Boop!!! Use yyyy-mm-dd or d/m/yyyy HHmm for a deadline date.");
-            }
-        }
+        return new Deadline(description, parseDateTime(by));
     }
 
-    private static Event createEvent(String input) {
+    private static Event createEvent(String input) throws BastionException {
         if (input.equals("event")) return null;
         int fromIndex = input.indexOf(" /from ");
         if (fromIndex <= "event ".length()) return null;
@@ -183,7 +170,34 @@ public class Bastion {
         String description = input.substring("event ".length(), fromIndex).strip();
         String from = input.substring(fromIndex + " /from ".length(), toIndex).strip();
         String to = input.substring(toIndex + " /to ".length()).strip();
-        return description.isEmpty() || from.isEmpty() || to.isEmpty() ? null : new Event(description, from, to);
+        return description.isEmpty() || from.isEmpty() || to.isEmpty()
+                ? null : new Event(description, parseDateTime(from), parseDateTime(to));
+    }
+
+    /**
+     * Parses a date or date-time accepted by Bastion commands.
+     */
+    private static LocalDateTime parseDateTime(String input) throws BastionException {
+        try {
+            return LocalDate.parse(input).atStartOfDay();
+        } catch (DateTimeParseException e) {
+            // Try the date-time formats below.
+        }
+
+        DateTimeFormatter isoDateTime = DateTimeFormatter.ofPattern("uuuu-M-d HHmm")
+                .withResolverStyle(ResolverStyle.STRICT);
+        DateTimeFormatter dayMonthDateTime = DateTimeFormatter.ofPattern("d/M/uuuu HHmm")
+                .withResolverStyle(ResolverStyle.STRICT);
+        try {
+            return LocalDateTime.parse(input, isoDateTime);
+        } catch (DateTimeParseException e) {
+            try {
+                return LocalDateTime.parse(input, dayMonthDateTime);
+            } catch (DateTimeParseException ignored) {
+                throw new BastionException(
+                    "Beep Beep Boop!!! Use yyyy-mm-dd, yyyy-mm-dd HHmm, or d/m/yyyy HHmm for a date.");
+            }
+        }
     }
 
 }
