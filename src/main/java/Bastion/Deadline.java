@@ -21,6 +21,7 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /** Returns this deadline in the format used in the user interface. */
     @Override
     public String toString() {
         DateTimeFormatter formatter = by.toLocalTime().equals(LocalTime.MIDNIGHT)
@@ -28,6 +29,7 @@ public class Deadline extends Task {
         return "[D]" + super.toString() + " (by: " + by.format(formatter) + ")";
     }
 
+    /** Returns this deadline in the format used for persistence. */
     @Override
     public String toFileString() {
         return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + by;

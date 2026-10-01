@@ -22,12 +22,14 @@ public class Event extends Task {
         this.to = to;
     }
 
+    /** Returns this event in the format used in the user interface. */
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + from.format(DISPLAY_FORMAT)
                 + " to: " + to.format(DISPLAY_FORMAT) + ")";
     }
 
+    /** Returns this event in the format used for persistence. */
     @Override
     public String toFileString() {
         return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + from + " | " + to;

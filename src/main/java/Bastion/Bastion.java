@@ -12,6 +12,12 @@ import java.time.format.ResolverStyle;
 public class Bastion {
     private static final int MAX_TASKS = 100;
 
+    /**
+     * Starts the command-line application and processes commands until the user exits.
+     *
+     * @param args command-line arguments, which are not used
+     * @throws IOException if task data cannot be read or saved
+     */
     public static void main(String[] args) throws IOException {
         Storage storage = new Storage();
         TaskList tasks = new TaskList(storage.loadTasks());
@@ -142,7 +148,11 @@ public class Bastion {
     }
 
     /**
-     * Creates a deadline from an ISO date or a day/month/year time command argument.
+     * Extracts the description and due date from a deadline command.
+     *
+     * @param input complete command entered by the user
+     * @return a deadline, or {@code null} when required parts are missing
+     * @throws BastionException if the due date has an unsupported format
      */
     private static Deadline createDeadline(String input) throws BastionException {
         if (input.equals("deadline")) return null;
@@ -159,6 +169,13 @@ public class Bastion {
         return new Deadline(description, parseDateTime(by));
     }
 
+    /**
+     * Extracts the description, start, and end date-times from an event command.
+     *
+     * @param input complete command entered by the user
+     * @return an event, or {@code null} when required parts are missing
+     * @throws BastionException if a date or time has an unsupported format
+     */
     private static Event createEvent(String input) throws BastionException {
         if (input.equals("event")) return null;
         int fromIndex = input.indexOf(" /from ");
@@ -175,7 +192,11 @@ public class Bastion {
     }
 
     /**
-     * Parses a date or date-time accepted by Bastion commands.
+     * Parses a supported date or date-time into a structured value.
+     *
+     * @param input date or date-time text from a command
+     * @return parsed date and time; a date without a time starts at midnight
+     * @throws BastionException if the input does not match a supported format
      */
     private static LocalDateTime parseDateTime(String input) throws BastionException {
         try {

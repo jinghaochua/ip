@@ -7,7 +7,11 @@ public class Task {
     protected String description;
     protected boolean isDone;
 
-    /** Creates an incomplete task with the given description. */
+    /**
+     * Creates an incomplete task with the given description.
+     *
+     * @param description text describing the task
+     */
     public Task(String description) {
         this.description = description;
         this.isDone = false;
@@ -33,6 +37,7 @@ public class Task {
         return description;
     }
 
+    /** Returns this task in the format used in the user interface. */
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;
