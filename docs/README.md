@@ -147,4 +147,4 @@ Your tasks are stored in `data/bastion.txt`, relative to the folder from which y
 - **Task list full:** Bastion supports up to 100 tasks. Delete tasks you no longer need; marking them done does not free space.
 - **Tasks missing after restarting:** check that you launched Bastion from the same folder as before.
 
-Avoid ` | ` (a vertical bar surrounded by spaces) in descriptions, as it is used to separate saved task fields.
+Avoid '|' (a vertical bar surrounded by spaces) in descriptions, as it is used to separate saved task fields.
