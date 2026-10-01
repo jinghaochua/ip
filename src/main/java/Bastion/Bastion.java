@@ -1,14 +1,16 @@
 package Bastion;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.ArrayList;
 
+/**
+ * Starts the Bastion command-line task manager and coordinates its collaborators.
+ */
 public class Bastion {
     private static final int MAX_TASKS = 100;
 
     public static void main(String[] args) throws IOException {
         Storage storage = new Storage();
-        ArrayList<Task> tasks = new ArrayList<>(storage.loadTasks());
+        TaskList tasks = new TaskList(storage.loadTasks());
 
         printLine();
         System.out.println("Hello! I'm Bastion.");
@@ -33,7 +35,7 @@ public class Bastion {
                             int taskNumber = Integer.parseInt(input.substring(5)) - 1;
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
                                 tasks.get(taskNumber).markAsDone();
-                                storage.saveTasks(tasks);
+                                storage.saveTasks(tasks.getTasks());
                                 printLine();
                                 System.out.println("Beep Beep! I've marked this task as done:");
                                 System.out.println("  " + tasks.get(taskNumber));
@@ -55,7 +57,7 @@ public class Bastion {
                             int taskNumber = Integer.parseInt(input.substring(7)) - 1;
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
                                 tasks.get(taskNumber).markAsNotDone();
-                                storage.saveTasks(tasks);
+                                storage.saveTasks(tasks.getTasks());
                                 printLine();
                                 System.out.println("Beep Beep! I've marked this task as not done yet:");
                                 System.out.println("  " + tasks.get(taskNumber));
@@ -83,7 +85,7 @@ public class Bastion {
                             printLine();
                         } else {
                             tasks.add(new Todo(description));
-                            storage.saveTasks(tasks);
+                            storage.saveTasks(tasks.getTasks());
                             printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     }
@@ -102,7 +104,7 @@ public class Bastion {
                             printLine();
                         } else {
                             tasks.add(task);
-                            storage.saveTasks(tasks);
+                            storage.saveTasks(tasks.getTasks());
                             printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     } 
@@ -121,7 +123,7 @@ public class Bastion {
                             printLine();
                         } else {
                             tasks.add(task);
-                            storage.saveTasks(tasks);
+                            storage.saveTasks(tasks.getTasks());
                             printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     } 
@@ -131,9 +133,8 @@ public class Bastion {
                             String numberString = input.substring(7).strip(); 
                             int taskNumber = Integer.parseInt(numberString) - 1;
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
-                                Task removedTask = tasks.get(taskNumber);
-                                tasks.remove(taskNumber);
-                                storage.saveTasks(tasks);
+                                Task removedTask = tasks.remove(taskNumber);
+                                storage.saveTasks(tasks.getTasks());
                                 
                                 printLine();
                                 System.out.println("Beep Beep! I've removed this task:");
@@ -200,7 +201,7 @@ public class Bastion {
         printLine();
     }
 
-    private static void printTasks(ArrayList<Task> tasks) {
+    private static void printTasks(TaskList tasks) {
         printLine();
         if (tasks.isEmpty()) {
             System.out.println("Your task list is empty.");
