@@ -30,7 +30,15 @@ public class Bastion {
                 try{
                     if (input.equals("list")) {
                         ui.showTaskList(tasks);
-                    } 
+                    }
+                    else if (input.equals("find") || input.startsWith("find ")) {
+                        String keyword = input.equals("find") ? "" : input.substring(5).strip();
+                        if (keyword.isEmpty()) {
+                            throw new BastionException(
+                                "Beep Beep Boop!!! Please provide a keyword after 'find'.");
+                        }
+                        ui.showMatchingTasks(tasks.find(keyword));
+                    }
                     else if (input.startsWith("mark ")) {
                         try {
                             int taskNumber = Integer.parseInt(input.substring(5)) - 1;

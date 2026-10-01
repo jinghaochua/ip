@@ -28,6 +28,11 @@ public class Task {
         return (isDone ? "X" : " ");
     }
 
+    /** Returns this task's description for searching and display. */
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;

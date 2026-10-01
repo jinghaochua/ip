@@ -1,6 +1,7 @@
 package Bastion;
 
 import java.util.Scanner;
+import java.util.List;
 
 /**
  * Handles all console input and output for the Bastion application.
@@ -58,6 +59,20 @@ public class Ui {
             System.out.println("Here are the tasks in your list:");
             for (int index = 0; index < tasks.size(); index++) {
                 System.out.println((index + 1) + "." + tasks.get(index));
+            }
+        }
+        showLine();
+    }
+
+    /** Displays tasks whose descriptions matched a user search. */
+    public void showMatchingTasks(List<Task> matchingTasks) {
+        showLine();
+        if (matchingTasks.isEmpty()) {
+            System.out.println("No matching tasks found.");
+        } else {
+            System.out.println("Here are the matching tasks in your list:");
+            for (int index = 0; index < matchingTasks.size(); index++) {
+                System.out.println((index + 1) + "." + matchingTasks.get(index));
             }
         }
         showLine();
