@@ -1,6 +1,5 @@
 package Bastion;
 import java.io.IOException;
-import java.util.Scanner;
 
 /**
  * Starts the Bastion command-line task manager and coordinates its collaborators.
@@ -11,24 +10,21 @@ public class Bastion {
     public static void main(String[] args) throws IOException {
         Storage storage = new Storage();
         TaskList tasks = new TaskList(storage.loadTasks());
+        Ui ui = new Ui();
 
-        printLine();
-        System.out.println("Hello! I'm Bastion.");
-        System.out.println("What can I do for you?");
-        printLine();
+        ui.showWelcome();
 
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (scanner.hasNextLine()) {
-                String input = scanner.nextLine().strip();
+        while (ui.hasNextCommand()) {
+                String input = ui.readCommand();
 
                 if (input.equals("bye")) {
-                    System.out.println("Beep Beep! Hope to see you again soon!");
+                    ui.showGoodbye();
                     break;
                 }
 
                 try{
                     if (input.equals("list")) {
-                        printTasks(tasks);
+                        ui.showTaskList(tasks);
                     } 
                     else if (input.startsWith("mark ")) {
                         try {
@@ -36,19 +32,12 @@ public class Bastion {
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
                                 tasks.get(taskNumber).markAsDone();
                                 storage.saveTasks(tasks.getTasks());
-                                printLine();
-                                System.out.println("Beep Beep! I've marked this task as done:");
-                                System.out.println("  " + tasks.get(taskNumber));
-                                printLine();
+                                ui.showTaskStatusChanged(tasks.get(taskNumber), true);
                             } else {
-                                printLine();
-                                System.out.println(" Beep Beep Boop!!! Invalid task number.");
-                                printLine();
+                                ui.showError(" Beep Beep Boop!!! Invalid task number.");
                             }
                         } catch (NumberFormatException e) {
-                            printLine();
-                            System.out.println(" Beep Beep Boop!!! Please provide a valid task number after 'mark'.");
-                            printLine();
+                            ui.showError(" Beep Beep Boop!!! Please provide a valid task number after 'mark'.");
                         }
                     } 
                     
@@ -58,19 +47,12 @@ public class Bastion {
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
                                 tasks.get(taskNumber).markAsNotDone();
                                 storage.saveTasks(tasks.getTasks());
-                                printLine();
-                                System.out.println("Beep Beep! I've marked this task as not done yet:");
-                                System.out.println("  " + tasks.get(taskNumber));
-                                printLine();
+                                ui.showTaskStatusChanged(tasks.get(taskNumber), false);
                             } else {
-                                printLine();
-                                System.out.println("Beep Beep Boop!!! Invalid task number.");
-                                printLine();
+                                ui.showError("Beep Beep Boop!!! Invalid task number.");
                             }
                         } catch (NumberFormatException e) {
-                            printLine();
-                            System.out.println("Beep Beep Boop!!! Please provide a valid task number after 'unmark'.");
-                            printLine();
+                            ui.showError("Beep Beep Boop!!! Please provide a valid task number after 'unmark'.");
                         }
                     } 
                     
@@ -80,51 +62,41 @@ public class Bastion {
                             throw new BastionException(
                                 "Beep Beep Boop!!! The description of a todo cannot be empty.");
                         } else if (tasks.size() == MAX_TASKS) {
-                            printLine();
-                            System.out.println("Beep Beep Boop!!! The task list is full.");
-                            printLine();
+                            ui.showError("Beep Beep Boop!!! The task list is full.");
                         } else {
                             tasks.add(new Todo(description));
                             storage.saveTasks(tasks.getTasks());
-                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                            ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     }
                     
                     else if (input.equals("deadline") || input.startsWith("deadline ")) {
                         if (tasks.size() == MAX_TASKS) {
-                            printLine();
-                            System.out.println("Beep Beep Boop!!! The task list is full.");
-                            printLine();
+                            ui.showError("Beep Beep Boop!!! The task list is full.");
                             continue;
                         }
                         Task task = createDeadline(input);
                         if (task == null) {
-                            printLine();
-                            System.out.println("Beep Beep Boop!!! The description or deadline date cannot be empty. Format: deadline [desc] /by [date]");
-                            printLine();
+                            ui.showError("Beep Beep Boop!!! The description or deadline date cannot be empty. Format: deadline [desc] /by [date]");
                         } else {
                             tasks.add(task);
                             storage.saveTasks(tasks.getTasks());
-                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                            ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     } 
                     
                     else if (input.equals("event") || input.startsWith("event ")) {
                         if (tasks.size() == MAX_TASKS) {
-                            printLine();
-                            System.out.println("Beep Beep Boop!!! The task list is full.");
-                            printLine();
+                            ui.showError("Beep Beep Boop!!! The task list is full.");
                             continue;
                         }
                         Task task = createEvent(input);
                         if (task == null) {
-                            printLine();
-                            System.out.println("Beep Beep Boop!!! The description or event timing cannot be empty. Format: event [desc] /from [date] /to [date]");
-                            printLine();
+                            ui.showError("Beep Beep Boop!!! The description or event timing cannot be empty. Format: event [desc] /from [date] /to [date]");
                         } else {
                             tasks.add(task);
                             storage.saveTasks(tasks.getTasks());
-                            printTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
+                            ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                         }
                     } 
 
@@ -135,22 +107,13 @@ public class Bastion {
                             if (taskNumber >= 0 && taskNumber < tasks.size()) {
                                 Task removedTask = tasks.remove(taskNumber);
                                 storage.saveTasks(tasks.getTasks());
-                                
-                                printLine();
-                                System.out.println("Beep Beep! I've removed this task:");
-                                System.out.println("  " + removedTask);
-                                System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-                                printLine();
+                                ui.showTaskRemoved(removedTask, tasks.size());
                             } else {
-                                printLine();
-                                System.out.println("Beep Beep Boop!!! Invalid task number.");
-                                printLine();
+                                ui.showError("Beep Beep Boop!!! Invalid task number.");
                             }
 
                         } catch (NumberFormatException e) {
-                            printLine();
-                            System.out.println("Beep Beep Boop!!! Please provide a valid task number after 'delete'.");
-                            printLine();
+                            ui.showError("Beep Beep Boop!!! Please provide a valid task number after 'delete'.");
                         }
                     }
 
@@ -160,12 +123,9 @@ public class Bastion {
                     }
                         
                 } catch (BastionException e) {
-                    printLine();
-                    System.out.println(e.getMessage());
-                    printLine();
+                    ui.showError(e.getMessage());
                 }
             }
-        }
     }
 
     private static Deadline createDeadline(String input) {
@@ -193,29 +153,4 @@ public class Bastion {
         return description.isEmpty() || from.isEmpty() || to.isEmpty() ? null : new Event(description, from, to);
     }
 
-    private static void printTaskAdded(Task task, int taskCount) {
-        printLine();
-        System.out.println("Beep Beep! I've added this task:");
-        System.out.println("  " + task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
-        printLine();
-    }
-
-    private static void printTasks(TaskList tasks) {
-        printLine();
-        if (tasks.isEmpty()) {
-            System.out.println("Your task list is empty.");
-            printLine();
-            return;
-        }
-        System.out.println("Here are the tasks in your list:");
-        for (int index = 0; index < tasks.size(); index++) {
-            System.out.println((index + 1) + "." + tasks.get(index));
-        }
-        printLine();
-    }
-
-    private static void printLine() {
-        System.out.println("____________________________________________________________________________________");
-    }
 }
