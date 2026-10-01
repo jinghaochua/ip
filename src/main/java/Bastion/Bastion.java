@@ -1,5 +1,10 @@
 package Bastion;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 /**
  * Starts the Bastion command-line task manager and coordinates its collaborators.
@@ -128,7 +133,10 @@ public class Bastion {
             }
     }
 
-    private static Deadline createDeadline(String input) {
+    /**
+     * Creates a deadline from an ISO date or a day/month/year time command argument.
+     */
+    private static Deadline createDeadline(String input) throws BastionException {
         if (input.equals("deadline")) return null;
         int byIndex = input.indexOf(" /by ");
         if (byIndex <= "deadline ".length() || byIndex + " /by ".length() >= input.length()) {
@@ -136,7 +144,24 @@ public class Bastion {
         }
         String description = input.substring("deadline ".length(), byIndex).strip();
         String by = input.substring(byIndex + " /by ".length()).strip();
-        return description.isEmpty() || by.isEmpty() ? null : new Deadline(description, by);
+        if (description.isEmpty() || by.isEmpty()) {
+            return null;
+        }
+
+        try {
+            LocalDateTime dateTime = LocalDate.parse(by).atStartOfDay();
+            return new Deadline(description, dateTime);
+        } catch (DateTimeParseException e) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/uuuu HHmm")
+                        .withResolverStyle(ResolverStyle.STRICT);
+                LocalDateTime dateTime = LocalDateTime.parse(by, formatter);
+                return new Deadline(description, dateTime);
+            } catch (DateTimeParseException ignored) {
+                throw new BastionException(
+                    "Beep Beep Boop!!! Use yyyy-mm-dd or d/m/yyyy HHmm for a deadline date.");
+            }
+        }
     }
 
     private static Event createEvent(String input) {
